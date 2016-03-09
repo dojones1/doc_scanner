@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "ScannedDoc.hpp"
+#include "ScannedDoc.h"
 #include <stdexcept>
 
 struct test_file_info_s {

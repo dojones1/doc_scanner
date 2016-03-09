@@ -1,0 +1,26 @@
+CC = g++
+CPPFLAGS  = -Wall -Werror
+CPPFLAGS += -std=c++11
+RMF = rm -f
+RMRF = rm -rf
+MKDIR = mkdir -p
+
+OSXBUILDDIR = ./osx
+OSXOBJDIR = $(OSXBUILDDIR)/obj
+OSXBINDIR = $(OSXBUILDDIR)/bin
+
+UTBUILDDIR = ./osx_ut
+UTOBJDIR = $(UTBUILDDIR)/obj
+UTBINDIR = $(UTBUILDDIR)/bin
+
+_Q = @
+
+$(OSXOBJDIR)/%.o: %.cpp
+	@ echo "\033[0;33m [ OSX_OBJ:     $@ ] \033[m"
+	$(_Q) $(CC) $(CPPFLAGS) -c -o $@ $<
+
+$(UTOBJDIR)/%.o: %.cpp
+	@ echo "\033[0;32m [ OSX_UT_OBJ:  $@ ] \033[m"
+	$(_Q) $(CC) $(CPPFLAGS) -c -o $@ $<
+
+
