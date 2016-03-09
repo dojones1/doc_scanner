@@ -1,9 +1,15 @@
+###########################
+# Build tools
+
 CC = g++
 CPPFLAGS  = -Wall -Werror
 CPPFLAGS += -std=c++11
 RMF = rm -f
 RMRF = rm -rf
 MKDIR = mkdir -p
+
+###########################
+# Directories
 
 OSXBUILDDIR = ./osx
 OSXOBJDIR = $(OSXBUILDDIR)/obj
@@ -13,7 +19,22 @@ UTBUILDDIR = ./osx_ut
 UTOBJDIR = $(UTBUILDDIR)/obj
 UTBINDIR = $(UTBUILDDIR)/bin
 
+###########################
+# Control flags
+
 _Q = @
+
+
+###########################
+# Aggregate lists
+
+ALL_BINS = 
+ALL_OBJS = 
+ALL_TESTS = 
+ALL_TESTS_RUN =
+
+###########################
+# Basic build rules
 
 $(OSXOBJDIR)/%.o: %.cpp
 	@ echo "\033[0;33m [ OSX_OBJ:     $@ ] \033[m"
@@ -23,4 +44,37 @@ $(UTOBJDIR)/%.o: %.cpp
 	@ echo "\033[0;32m [ OSX_UT_OBJ:  $@ ] \033[m"
 	$(_Q) $(CC) $(CPPFLAGS) -c -o $@ $<
 
+###########################
+# Macros
+###########################
 
+# MAKE_OSX_UT
+# ${1}   target
+# ${2}   TARGET (in upper case)
+# ${3}   SRCs
+# ${4}   OBJs
+# ${5}   Include directories
+
+define MAKE_OSX_UT
+$(2)_SRC = main_test.cpp
+$(2)_OBJECTS = $(UTOBJDIR)/main_test.o
+$(2)_INCLUDES = 
+$(1): directories $$($(2)_OBJECTS)
+	@ echo "\033[0;36m [ OSX_UT_BIN:  $$@ ] \033[m"
+	$(_Q) $(CC) $(CPPFLAGS) $$($(2)_INCLUDES) $$($(2)_OBJECTS) -o $(UTBINDIR)/$$@
+ALL_OBJS  += $(2)_OBJECTS
+ALL_BINS  += $(1)
+ALL_TESTS += $(1)
+
+$(1)_run: $(1)
+	@ echo "\033[0;37m [ OSX_UT_RUN:  $$@ ] \033[m"
+	$(UTBINDIR)/$(1)
+
+ALL_TESTS_RUN += $(1)_run
+
+$(1)_clean:
+	$(_Q) $(RMF) $(UTBINDIR)/$(1)
+	$(_Q) $(RMF) $$($(2)_OBJECTS)
+	
+ALL_CLEANS += $(1)_clean
+endef
