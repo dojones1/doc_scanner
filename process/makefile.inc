@@ -1,0 +1,1 @@
+include $(DOC_SCANNERP_DIR)/makefile.inc

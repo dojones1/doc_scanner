@@ -1,0 +1,26 @@
+ROOT = .
+###########################
+# Build Object paths
+BUILD_DIR = $(ROOT)/build
+
+###########################
+# COMMON_DIRS
+define COMMON_DIRS
+$(1)_BUILD_DIR = $(BUILD_DIR)/$(1)
+$(1)_OBJ_DIR = $$($(1)_BUILD_DIR)/obj
+$(1)_BIN_DIR = $$($(1)_BUILD_DIR)/bin
+endef
+
+$(eval $(call COMMON_DIRS,OSX))
+$(eval $(call COMMON_DIRS,OSXUT))
+
+###########################
+# Setup paths
+
+
+COMMON_LIB_DIR = $(ROOT)/common/lib
+SCANNEDDOC_DIR = $(COMMON_LIB_DIR)/ScannedDoc
+
+PROCESS_DIR = $(ROOT)/process
+DOC_SCANNERP_DIR = $(PROCESS_DIR)/doc_scannerp
+

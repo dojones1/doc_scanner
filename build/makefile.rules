@@ -1,23 +1,17 @@
+include build/makefile.dirs
+
 ###########################
 # Build tools
 
-CC = g++
-CPPFLAGS  = -Wall -Werror
-CPPFLAGS += -std=c++11
+OSX_CC = g++
+OSX_CCPLUSPLUS = g++
+OSX_FLAGS  = -Wall -Werror
+OSX_FLAGS += -std=c++11
 RMF = rm -f
 RMRF = rm -rf
 MKDIR = mkdir -p
 
-###########################
-# Directories
 
-OSXBUILDDIR = ./osx
-OSXOBJDIR = $(OSXBUILDDIR)/obj
-OSXBINDIR = $(OSXBUILDDIR)/bin
-
-UTBUILDDIR = ./osx_ut
-UTOBJDIR = $(UTBUILDDIR)/obj
-UTBINDIR = $(UTBUILDDIR)/bin
 
 ###########################
 # Control flags
@@ -30,51 +24,189 @@ _Q = @
 
 ALL_BINS = 
 ALL_OBJS = 
+ALL_CLEANS = 
 ALL_TESTS = 
 ALL_TESTS_RUN =
+
+
+###########################
+# Make the Directories for build artefacts
+
+
+directories:
+	$(_Q) $(MKDIR) $(OSX_BUILD_DIR)
+	$(_Q) $(MKDIR) $(OSX_BIN_DIR) 
+	$(_Q) $(MKDIR) $(OSX_OBJ_DIR)
+	$(_Q) $(MKDIR) $(OSXUT_BUILD_DIR) 
+	$(_Q) $(MKDIR) $(OSXUT_BIN_DIR) 
+	$(_Q) $(MKDIR) $(OSXUT_OBJ_DIR)
+
+directories_clean:
+	$(_Q) $(RMRF) $(OSX_BIN_DIR) 
+	$(_Q) $(RMRF) $(OSX_OBJ_DIR)
+	$(_Q) $(RMRF) $(OSX_BUILD_DIR)
+	$(_Q) $(RMRF) $(OSXUT_BIN_DIR) 
+	$(_Q) $(RMRF) $(OSXUT_OBJ_DIR)
+	$(_Q) $(RMRF) $(OSXUT_BUILD_DIR)
+
+ALL_CLEANS += directories_clean
 
 ###########################
 # Basic build rules
 
-$(OSXOBJDIR)/%.o: %.cpp
-	@ echo "\033[0;33m [ OSX_OBJ:     $@ ] \033[m"
-	$(_Q) $(CC) $(CPPFLAGS) -c -o $@ $<
+# $(OSXOBJDIR)/%.o: %.cpp
+# 	@ echo "\033[0;33m [ OSX_OBJ:     $@ ] \033[m"
+# 	$(_Q) $(MKDIR) $(dir $(OSXOBJDIR)/$<)
+# 	$(_Q) $(CC) $(CPPFLAGS) -c -o $@ $<
 
-$(UTOBJDIR)/%.o: %.cpp
-	@ echo "\033[0;32m [ OSX_UT_OBJ:  $@ ] \033[m"
-	$(_Q) $(CC) $(CPPFLAGS) -c -o $@ $<
+# $(UTOBJDIR)/%.o: %.cpp
+# 	@ echo "\033[0;32m [ OSX_UT_OBJ:  $@ ] \033[m"
+# 	$(_Q) $(MKDIR) $(dir $(UTOBJDIR)/$<)
+# 	$(_Q) $(CC) $(CPPFLAGS) -c -o $@ $<
+
 
 ###########################
 # Macros
 ###########################
+ 
+# Initial we repeated the above for each target win, arm x86 etc. 
+# We then changed this too. Notice $($(8)_OBJ_DIR). 
+# This will expand to $(X86_OBJ_DIR) based on the value passed in as $(8).
+ 
+#Parameters to macro
+# 1 is the name of the make file target
+# 2 is the name of the library
+# 3 is the list of c files
+# 4 is the c flags
+# 5 is the list of c++ files
+# 6 is the c++ flags
+# 7 is the target
+ 
+define COMMON_LIB
+ 
+#.c subsubsitution rule i.e. turn c files into .o files
+$($(7)_OBJ_DIR) )/%.o:$(ROOT)/%.c
+	$(_Q) $(MKDIR) $(dir $$($(7)_OBJ_DIR)/$<)
+	$(_Q) $$($(7)_CC) $$($(7)_FLAGS) $(4) –c $$< -o $$@
+ 
+#.cpp subsubsitution rule i.e. turn cpp files into .o files
+$($(7)_OBJ_DIR)/%.o:$(ROOT)/%.cpp
+	$(_Q) $(MKDIR) $(dir $$($(7)_OBJ_DIR)/$<)
+	$(_Q) $$($(7)_CCPLUSPLUS) $$($(7)_FLAGS) $(6) –c $$< -o $$@
+ 
+#lib rule dependent on all .o which are created from the .c and .cpp files passed in
+$($(7)_LIB_DIR)/$(2):$(patsubst $(ROOT)/%.c, $($(7)_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $($(7)_OBJ_DIR)/%.o,$(5))
+    $(_Q) $$($(7)_AR) –cr  $(patsubst $(ROOT)/%.c, $($(7)_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $($(7)_OBJ_DIR)/%.o,$(5))
+ 
+#target dependent on library
+$(1): $($(7)_LIB_DIR)/$(2)
+ 
+endef
 
-# MAKE_OSX_UT
-# ${1}   target
-# ${2}   TARGET (in upper case)
-# ${3}   SRCs
-# ${4}   OBJs
-# ${5}   Include directories
+ 
+define OSX_LIB
+$(eval $(call COMMON_LIB,$(1), $(2), $(3), $(4), $(5), $(6), OSX))
+endef
+ 
+define X86_LIB
+$(eval $(call COMMON_LIB,$(1), $(2), $(3), $(4), $(5), $(6), X86))
+endef
 
-define MAKE_OSX_UT
-$(2)_SRC = main_test.cpp
-$(2)_OBJECTS = $(UTOBJDIR)/main_test.o
-$(2)_INCLUDES = 
-$(1): directories $$($(2)_OBJECTS)
-	@ echo "\033[0;36m [ OSX_UT_BIN:  $$@ ] \033[m"
-	$(_Q) $(CC) $(CPPFLAGS) $$($(2)_INCLUDES) $$($(2)_OBJECTS) -o $(UTBINDIR)/$$@
-ALL_OBJS  += $(2)_OBJECTS
-ALL_BINS  += $(1)
-ALL_TESTS += $(1)
+define ARM_LIB
+$(eval $(call COMMON_LIB,$(1), $(2), $(3), $(4), $(5), $(6), ARM))
+endef
+
+###########################
+
+# COMMON_BIN
+# 1 - name of the make file target
+# 2 - name of the binary file
+# 3 - list of c files
+# 4 - c flags
+# 5 - list of c++ files
+# 6 - c++ flags
+# 7 - target
+
+define COMMON_BIN
+
+#.c subsubsitution rule i.e. turn c files into .o files
+$$($(7)_OBJ_DIR) )/%.o:$(ROOT)/%.c
+	@ echo "\033[0;34m [ $(7)_OBJ_C:     $$@ $<] \033[m"
+	$(_Q) $(MKDIR) `dirname $$@`
+	$(_Q) $$($(7)_CC) $$($(7)_FLAGS) -c $(4) $$< -o $$@
+ 
+#.cpp subsubsitution rule i.e. turn cpp files into .o files
+$$($(7)_OBJ_DIR)/%.o:$(ROOT)/%.cpp
+	@ echo "\033[0;34m [ $(7)_OBJ_C++: $$@] \033[m"
+	$(_Q) $(MKDIR) `dirname $$@`
+	$(_Q) $$($(7)_CCPLUSPLUS) $$($(7)_FLAGS) -c $(6) $$< -o $$@ 
+ 
+# bin rule dependent on all .o which are created from the .c and .cpp files passed in
+$$($(7)_BIN_DIR)/$(2): $(patsubst $(ROOT)/%.c, $$($(7)_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_OBJ_DIR)/%.o,$(5))
+	@ echo "\033[0;35m [ $(7)_BIN:     $$@ $<] \033[m"
+	$(_Q) $(MKDIR) $(dir $$($(7)_BIN_DIR)/$(2))
+	$(_Q) $$($(7)_CC) $$($(7)_FLAGS) $6 $(patsubst $(ROOT)/%.c, $$($(7)_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_OBJ_DIR)/%.o,$(5)) -o $$($(7)_BIN_DIR)/$2
+	
+# target dependent on binary
+$(1): $$($(7)_BIN_DIR)/$(2)
+	@ echo "\033[0;35m [ $(7)_TARGET:     $$@ ] \033[m"
+
+ALL_OBJS += $(patsubst $(ROOT)/%.c, $$($(7)_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_OBJ_DIR)/%.o,$(5))
+ALL_BINS += $$($(7)_BIN_DIR)/$(2)
+
+$(1)_clean:
+	$(_Q) $(RMF) $$($(7)_BIN_DIR)/$(2)
+	$(_Q) $(RMF) $$(patsubst $(ROOT)/%.c, $$($(7)_OBJ_DIR)/%.o,$(3)) $$(patsubst $(ROOT)/%.cpp, $$($(7)_OBJ_DIR)/%.o,$(5))
+	
+ALL_CLEANS += $(1)_clean
+
+endef
+
+define OSX_BIN
+$(eval $(call COMMON_BIN,$(1),$(2),$(3),$(4),$(5),$(6),OSX))
+endef
+ 
+define X86_BIN
+$(eval $(call COMMON_BIN,$(1),$(2),$(3),$(4),$(5),$(6),X86))
+endef
+
+define ARM_BIN
+$(eval $(call COMMON_BIN,$(1),$(2),$(3),$(4),$(5),$(6),ARM))
+endef
+
+###########################
+
+# COMMON_UT
+# 1 - name of the make file target
+# 2 - name of the binary file
+# 3 - list of c files
+# 4 - c flags
+# 5 - list of c++ files
+# 6 - c++ flags
+# 7 - target
+
+define COMMON_UT
+# $(eval $(call COMMON_BIN,$(1),$(2),$(3),$(4),$(5),$(6),$(7)))
+
+ALL_TESTS += $$($(7)_BIN_DIR)/$(2)
 
 $(1)_run: $(1)
 	@ echo "\033[0;37m [ OSX_UT_RUN:  $$@ ] \033[m"
-	$(UTBINDIR)/$(1)
+	$(_Q) $$($(7)_BIN_DIR)/$(2)
 
 ALL_TESTS_RUN += $(1)_run
 
-$(1)_clean:
-	$(_Q) $(RMF) $(UTBINDIR)/$(1)
-	$(_Q) $(RMF) $$($(2)_OBJECTS)
-	
-ALL_CLEANS += $(1)_clean
 endef
+
+define OSX_UT
+$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),OSX))
+endef
+ 
+define X86_UT
+$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),X86))
+endef
+
+define ARM_UT
+$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),ARM))
+endef
+
