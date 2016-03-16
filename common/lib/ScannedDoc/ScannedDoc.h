@@ -9,6 +9,7 @@
 #ifndef ScannedDoc_hpp
 #define ScannedDoc_hpp
 
+#include <stdexcept>
 #include <stdio.h>
 #include <string>
 #include <iostream>
@@ -16,6 +17,7 @@
 #include <fstream>
 #include <vector>
 #include <iomanip>
+
 
 using namespace std;
 
@@ -39,7 +41,6 @@ public:
     {
         m_filename.assign(filename);
         m_letter_freq.assign(26, 0);
-        
         
         // Process the file itself
         m_ifs.open(m_filename);
