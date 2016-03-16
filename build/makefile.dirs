@@ -16,11 +16,10 @@ $(eval $(call COMMON_DIRS,OSXUT))
 
 ###########################
 # Setup paths
-
-
 COMMON_LIB_DIR = $(ROOT)/common/lib
 SCANNEDDOC_DIR = $(COMMON_LIB_DIR)/ScannedDoc
 
 PROCESS_DIR = $(ROOT)/process
 DOC_SCANNERP_DIR = $(PROCESS_DIR)/doc_scannerp
 
+THIRDPARTY_DIR = $(ROOT)/thirdparty

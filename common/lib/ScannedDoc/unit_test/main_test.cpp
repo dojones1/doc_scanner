@@ -70,7 +70,7 @@ void doTestFile(test_file_info_s tf)
     }
 }
 
-int main(int argc, const char * argv[])
+int main(int, const char **)
 {
     vector<test_file_info_s> vTestFiles(testFileInfo, testFileInfo + sizeof(testFileInfo) / sizeof(testFileInfo[0]) );
     

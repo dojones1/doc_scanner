@@ -5,7 +5,7 @@ include build/makefile.dirs
 
 OSX_CC = g++
 OSX_CCPLUSPLUS = g++
-OSX_FLAGS  = -Wall -Werror
+OSX_FLAGS  = -Wall -Werror -Wextra
 OSX_FLAGS += -std=c++11
 RMF = rm -f
 RMRF = rm -rf
@@ -52,20 +52,6 @@ directories_clean:
 ALL_CLEANS += directories_clean
 
 ###########################
-# Basic build rules
-
-# $(OSXOBJDIR)/%.o: %.cpp
-# 	@ echo "\033[0;33m [ OSX_OBJ:     $@ ] \033[m"
-# 	$(_Q) $(MKDIR) $(dir $(OSXOBJDIR)/$<)
-# 	$(_Q) $(CC) $(CPPFLAGS) -c -o $@ $<
-
-# $(UTOBJDIR)/%.o: %.cpp
-# 	@ echo "\033[0;32m [ OSX_UT_OBJ:  $@ ] \033[m"
-# 	$(_Q) $(MKDIR) $(dir $(UTOBJDIR)/$<)
-# 	$(_Q) $(CC) $(CPPFLAGS) -c -o $@ $<
-
-
-###########################
 # Macros
 ###########################
  
@@ -85,7 +71,7 @@ ALL_CLEANS += directories_clean
 define COMMON_LIB
  
 #.c subsubsitution rule i.e. turn c files into .o files
-$($(7)_OBJ_DIR) )/%.o:$(ROOT)/%.c
+$($(7)_OBJ_DIR))/%.o:$(ROOT)/%.c
 	$(_Q) $(MKDIR) $(dir $$($(7)_OBJ_DIR)/$<)
 	$(_Q) $$($(7)_CC) $$($(7)_FLAGS) $(4) –c $$< -o $$@
  
@@ -105,15 +91,15 @@ endef
 
  
 define OSX_LIB
-$(eval $(call COMMON_LIB,$(1), $(2), $(3), $(4), $(5), $(6), OSX))
+$(eval $(call COMMON_LIB,$(1),$(2),$(3),$(4),$(5),$(6),OSX))
 endef
  
 define X86_LIB
-$(eval $(call COMMON_LIB,$(1), $(2), $(3), $(4), $(5), $(6), X86))
+$(eval $(call COMMON_LIB,$(1),$(2),$(3),$(4),$(5),$(6),X86))
 endef
 
 define ARM_LIB
-$(eval $(call COMMON_LIB,$(1), $(2), $(3), $(4), $(5), $(6), ARM))
+$(eval $(call COMMON_LIB,$(1),$(2),$(3),$(4),$(5),$(6),ARM))
 endef
 
 ###########################
@@ -130,7 +116,7 @@ endef
 define COMMON_BIN
 
 #.c subsubsitution rule i.e. turn c files into .o files
-$$($(7)_OBJ_DIR) )/%.o:$(ROOT)/%.c
+$$($(7)_OBJ_DIR))/%.o:$(ROOT)/%.c
 	@ echo "\033[0;34m [ $(7)_OBJ_C:     $$@ $<] \033[m"
 	$(_Q) $(MKDIR) `dirname $$@`
 	$(_Q) $$($(7)_CC) $$($(7)_FLAGS) -c $(4) $$< -o $$@
@@ -186,7 +172,7 @@ endef
 # 7 - target
 
 define COMMON_UT
-# $(eval $(call COMMON_BIN,$(1),$(2),$(3),$(4),$(5),$(6),$(7)))
+ $(eval $(call COMMON_BIN,$(1),$(2),$(3),$(4),$(5),$(6),$(7)))
 
 ALL_TESTS += $$($(7)_BIN_DIR)/$(2)
 

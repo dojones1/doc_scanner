@@ -118,9 +118,9 @@ private:
         {
             m_word_count++;
             
-            for (auto idx = 0; idx < word.length(); ++idx)
+            for (char& c : word)
             {
-                parseChar(word[idx]);
+                parseChar(c);
             }
         }
         

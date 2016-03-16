@@ -1,4 +1,3 @@
-SCANNED_DOC_UT_CPP_SRC = $(wildcard $(SCANNEDDOC_DIR)/unit_test/*.cpp)
-SCANNED_DOC_UT_CPP_INCLUDES = -I$(SCANNEDDOC_DIR)
-
-$(eval $(call OSX_UT, scanned_doc_utx,SCANNED_DOC_UT,,,$(SCANNED_DOC_UT_CPP_SRC),$(SCANNED_DOC_UT_CPP_INCLUDES)))
+include $(SCANNEDDOC_DIR)/unit_test/makefile.inc 
+# include $(SCANNEDDOC_DIR)/unit_test_gt/makefile.inc
+scanned_doc:scanned_doc_ut
