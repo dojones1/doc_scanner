@@ -1,7 +1,6 @@
-
 *.out
 
-build/OSX
-build/OSX_UT
-build/X86
-build/X86_UT
+build/OSX/*
+build/OSX_UT/*
+build/X86/*
+build/X86_UT/*

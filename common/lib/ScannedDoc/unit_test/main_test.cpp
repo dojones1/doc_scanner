@@ -36,7 +36,7 @@ test_file_info_s testFileInfo[] = {
 
 void doTestFile(test_file_info_s tf)
 {
-    string rootPath = "/Users/donaldjones/Documents/xcode projects/trackMix/Oracle DocScanner/doc_scanner/doc_scanner/";
+    string rootPath = "common/lib/ScannedDoc/unit_test/etc/";
     
     string filename = rootPath + tf.filename;
     cout << "File: " << filename << endl;
