@@ -1,3 +1,7 @@
 language: cpp
 
+compiler:
+  - clang
+  - gcc
+  
 script: make all _Q=
