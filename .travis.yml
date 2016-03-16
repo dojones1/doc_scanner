@@ -4,4 +4,4 @@ compiler:
   - clang
 
   
-script: make all _Q=
+script: make clean;make all _Q=
