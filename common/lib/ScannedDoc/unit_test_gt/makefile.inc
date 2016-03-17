@@ -1,5 +1,5 @@
 SCANNED_DOC_UT_GT_CPP_SRC = $(wildcard $(SCANNEDDOC_DIR)/unit_test_gt/*.cpp)
-SCANNED_DOC_UT_GT_CPP_FLAGS = -I$(SCANNEDDOC_DIR) -I(GTEST_DIR)/include -lpthread
+SCANNED_DOC_UT_GT_CPP_FLAGS = -I$(SCANNEDDOC_DIR) -I$(GTEST_DIR)/include
 
 $(eval $(call OSX_UT,scanned_doc_ut_gt,SCANNED_DOC_UT_GT,,,$(SCANNED_DOC_UT_GT_CPP_SRC),$(SCANNED_DOC_UT_GT_CPP_FLAGS)))
 

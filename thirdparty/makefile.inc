@@ -27,30 +27,42 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 # trailing _.
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 
+define COMMON_GTEST_LIB
+# 1 - target
+
 # For simplicity and to avoid depending on Google Test's
 # implementation details, the dependencies specified below are
 # conservative and not optimized.  This is fine as Google Test
 # compiles fast and for ordinary users its source rarely changes.
-gtest-all.o : $(GTEST_SRCS_)
+$$($(1)_OBJ_DIR)/gtest-all.o : $(GTEST_SRCS_)
+	@ echo "\033[0;34m [ $(1)_OBJ_C: $$@] \033[m"
+	$(_Q) $(MKDIR) `dirname $$@`
 	$(CXX) $(GTEST_CPPFLAGS) -I$(GTEST_DIR) $(GTEST_CXXFLAGS) -c \
-            $(GTEST_DIR)/src/gtest-all.cc
+            $(GTEST_DIR)/src/gtest-all.cc  -o $$@ 
 
-gtest_main.o : $(GTEST_SRCS_)
+$$($(1)_OBJ_DIR)/gtest_main.o : $(GTEST_SRCS_)
+	@ echo "\033[0;34m [ $(1)_OBJ_C++: $$@] \033[m"
+	$(_Q) $(MKDIR) `dirname $$@`
 	$(CXX) $(GTEST_CPPFLAGS) -I$(GTEST_DIR) $(GTEST_CXXFLAGS) -c \
-            $(GTEST_DIR)/src/gtest_main.cc
+	        $(GTEST_DIR)/src/gtest_main.cc  -o $$@ 
 
-gtest.a : gtest-all.o
-	$(AR) $(ARFLAGS) $@ $^
+$$($(1)_OBJ_DIR)/gtest.a : $$($(1)_OBJ_DIR)/gtest-all.o
+	@ echo "\033[0;34m [ $(1)_AR: $$@] \033[m"
+	$(AR) $(ARFLAGS) $$@ $$^
 
-gtest_main.a : gtest-all.o gtest_main.o
-	$(AR) $(ARFLAGS) $@ $^
+$$($(1)_OBJ_DIR)/gtest_main.a : $$($(1)_OBJ_DIR)/gtest-all.o $$($(1)_OBJ_DIR)/gtest_main.o
+	@ echo "\033[0;34m [ $(1)_AR: $$@] \033[m"
+	$(AR) $(ARFLAGS) $$@ $$^
 	
-googletest:gtest_main.a
+$(1)_googletest:$$($(1)_OBJ_DIR)/gtest_main.a
 
-googletest_clean: 
-	$(RM) gtest.a gtest_main.a *.o
+$(1)_googletest_clean: 
+	$(RM) $$($(1)_OBJ_DIR)/gtest.a $$($(1)_OBJ_DIR)/gtest_main.a *.o
 	
-ALL_CLEANS += googletest_clean
+ALL_CLEANS += $(1)_googletest_clean
+THIRDPARTY_DEPS += $(1)_googletest
+endef
 
+$(eval $(call COMMON_GTEST_LIB,OSX));
 
-thirdparty: googletest
+thirdparty: $(THIRDPARTY_DEPS)
