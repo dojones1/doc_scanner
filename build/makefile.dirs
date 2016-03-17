@@ -12,10 +12,11 @@ $(1)_BIN_DIR = $$($(1)_BUILD_DIR)/bin
 endef
 
 $(eval $(call COMMON_DIRS,OSX))
-$(eval $(call COMMON_DIRS,OSXUT))
+$(eval $(call COMMON_DIRS,OSX_UT))
 
 ###########################
 # Setup paths
+TEST_RESULTS_DIR = $(ROOT)/build/test_results
 COMMON_LIB_DIR = $(ROOT)/common/lib
 SCANNEDDOC_DIR = $(COMMON_LIB_DIR)/ScannedDoc
 

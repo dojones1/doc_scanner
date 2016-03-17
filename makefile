@@ -17,9 +17,9 @@ alltests: $(ALL_TESTS)
 
 test: $(ALL_TESTS_RUN)
 
-all: software test
+all: directories software test
 
 install: all
 	@echo you must be root to install
 
-clean: $(ALL_CLEANS)
+clean: $(ALL_CLEANS) directories_clean

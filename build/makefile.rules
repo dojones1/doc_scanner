@@ -40,21 +40,23 @@ ALL_TESTS_RUN =
 
 
 directories:
+	$(_Q) $(MKDIR) $(TEST_RESULTS_DIR)
 	$(_Q) $(MKDIR) $(OSX_BUILD_DIR)
 	$(_Q) $(MKDIR) $(OSX_BIN_DIR) 
 	$(_Q) $(MKDIR) $(OSX_OBJ_DIR)
-	$(_Q) $(MKDIR) $(OSXUT_BUILD_DIR) 
-	$(_Q) $(MKDIR) $(OSXUT_BIN_DIR) 
-	$(_Q) $(MKDIR) $(OSXUT_OBJ_DIR)
+	$(_Q) $(MKDIR) $(OSX_UT_BUILD_DIR) 
+	$(_Q) $(MKDIR) $(OSX_UT_BIN_DIR) 
+	$(_Q) $(MKDIR) $(OSX_UT_OBJ_DIR)
 
 directories_clean:
 	$(_Q) $(RMRF) $(OSX_BIN_DIR) 
 	$(_Q) $(RMRF) $(OSX_OBJ_DIR)
 	$(_Q) $(RMRF) $(OSX_BUILD_DIR)
-	$(_Q) $(RMRF) $(OSXUT_BIN_DIR) 
-	$(_Q) $(RMRF) $(OSXUT_OBJ_DIR)
-	$(_Q) $(RMRF) $(OSXUT_BUILD_DIR)
-
+	$(_Q) $(RMRF) $(OSX_UT_BIN_DIR) 
+	$(_Q) $(RMRF) $(OSX_UT_OBJ_DIR)
+	$(_Q) $(RMRF) $(OSX_UT_BUILD_DIR)
+	$(_Q) $(RMRF) $(TEST_RESULTS_DIR)
+	
 ALL_CLEANS += directories_clean
 
 ###########################
@@ -177,17 +179,44 @@ endef
 # 5 - list of c++ files
 # 6 - c++ flags
 # 7 - target
+# 8 - linker flags
 
 define COMMON_UT
 
-# echo "COMMON_UT: \n 1: $(1)\n 2: $(2)\n 3: $(3)\n 4: $(4)\n 5: $(5)\n 6: $(6)\n 7: $(7)"
-$(eval $(call COMMON_BIN,$(1),$(2),$(3),$(4),$(5),$(6),$(7)))
+#.c subsubsitution rule i.e. turn c files into .o files
+$$($(7)_UT_OBJ_DIR))/%.o:$(ROOT)/%.c
+	@ echo "\033[0;34m [ $(7)_UT_OBJ_C:     $$@ $<] \033[m"
+	$(_Q) $(MKDIR) `dirname $$@`
+	$(_Q) $$($(7)_CC) $$($(7)_FLAGS) -c $(4) $$< -o $$@
+ 
+#.cpp subsubsitution rule i.e. turn cpp files into .o files
+$$($(7)_UT_OBJ_DIR)/%.o:$(ROOT)/%.cpp
+	@ echo "\033[0;34m [ $(7)_UT_OBJ_C++: $$@] \033[m"
+	$(_Q) $(MKDIR) `dirname $$@`
+	$(_Q) $$($(7)_CCPLUSPLUS) $$($(7)_FLAGS) -c $(6) $$< -o $$@ 
+ 
+# bin rule dependent on all .o which are created from the .c and .cpp files passed in
+$$($(7)_UT_BIN_DIR)/$(2): $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5))
+	@ echo "\033[0;35m [ $(7)_UT_BIN:     $$@ $<] \033[m"
+	$(_Q) $(MKDIR) `dirname $$@`
+	$(_Q) $$($(7)_CC) $$($(7)_FLAGS) $6 $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5)) -o $$($(7)_UT_BIN_DIR)/$2
+	
+# target dependent on binary
+$(1): $$($(7)_UT_BIN_DIR)/$(2)
+	@ echo "\033[0;35m [ $(7)_UT_TARGET:     $$@ ] \033[m"
 
-ALL_TESTS += $$($(7)_BIN_DIR)/$(2)
+ALL_OBJS += $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5))
+
+$(1)_clean:
+	$(_Q) $(RMF) $$($(7)_UT_BIN_DIR)/$(2)
+	$(_Q) $(RMF) $$(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $$(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5))
+	
+ALL_CLEANS += $(1)_clean
+ALL_TESTS += $$($(7)_UT_BIN_DIR)/$(2)
 
 $(1)_run: $(1)
-	@ echo "\033[0;37m [ OSX_UT_RUN:  $$@ ] \033[m"
-	$(_Q) $$($(7)_BIN_DIR)/$(2)
+	@ echo "\033[0;37m [ $(7)_UT_RUN:  $$@ ] \033[m"
+	$(_Q) $$($(7)_UT_BIN_DIR)/$(2) --gtest_output=xml:$(TEST_RESULTS_DIR)/$(1).xml
 
 ALL_TESTS_RUN += $(1)_run
 
@@ -205,41 +234,4 @@ define ARM_UT
 $(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),ARM))
 endef
 
-
-###########################
-
-# COMMON_UT_GT
-# 1 - name of the make file target
-# 2 - name of the binary file
-# 3 - list of c files
-# 4 - c flags
-# 5 - list of c++ files
-# 6 - c++ flags
-# 7 - target
-
-define COMMON_UT_GT
-
-$(eval $(call COMMON_BIN,$(1),$(2),$(3),$(4),$(5),$(6),$(7)))
-
-ALL_TESTS += $$($(7)_BIN_DIR)/$(2)
-
-$(1)_run: $(1)
-	@ echo "\033[0;37m [ OSX_UT_RUN:  $$@ ] \033[m"
-	$(_Q) $$($(7)_BIN_DIR)/$(2)
-
-ALL_TESTS_RUN += $(1)_run
-
-endef
-
-define OSX_UT
-$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),OSX))
-endef
- 
-define X86_UT
-$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),X86))
-endef
-
-define ARM_UT
-$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),ARM))
-endef
 
