@@ -31,6 +31,8 @@
 //
 // </TechnicalDetails>
 
+string rootPath = "common/lib/ScannedDoc/unit_test/etc/";
+
 TEST(DISABLED_falseTest, Negative) {
  EXPECT_FALSE(1);
 }
@@ -44,6 +46,111 @@ TEST(DISABLED_trueTest, Negative) {
 
 TEST(trueTest, Positive) {
  EXPECT_TRUE(1);
+}
+
+/*test_file_info_s testFileInfo[] = {
+
+//      filename     lines, words, letter, mfl
+      { "test0.txt",     0,     0,      0, '\0'} // Empty file
+    , { "test0a.txt",    3,     0,      0, '\0'}
+    , { "test1.txt",     1,     1,      5, 'l' }
+    , { "test1a.txt",    1,     1,      5, 'l' }
+    , { "test1b.txt",    1,     2,     12, 'o'}
+    , { "test1c.txt",    1,     3,      7, 'b'}
+    , { "test2.txt",    26,    26,     26, 'a'}
+    , { "test3.txt",    26,    26,     27, 'n'}
+    , { "test4.txt",     1,    26,     26, 'a'}
+    , { "test5.txt",  3721, 21318,  85791, 'e'}
+}
+*/
+TEST(scanned_doc_ut_0, Positive) {
+	ScannedDoc doc(rootPath + "test0.txt");
+    
+    EXPECT_EQ(doc.getLineCount(), static_cast<const unsigned int>(0));
+    EXPECT_EQ(doc.getWordCount(), static_cast<const unsigned int>(0));
+    EXPECT_EQ(doc.getLetterCount(), static_cast<const unsigned int>(0));
+    EXPECT_EQ(doc.getMostFreqLetter(), '\0');   
+}
+
+TEST(scanned_doc_ut_0a, Positive) {
+	ScannedDoc doc(rootPath + "test0a.txt");
+    
+    EXPECT_EQ(doc.getLineCount(), static_cast<const unsigned int>(3));
+    EXPECT_EQ(doc.getWordCount(), static_cast<const unsigned int>(0));
+    EXPECT_EQ(doc.getLetterCount(), static_cast<const unsigned int>(0));
+    EXPECT_EQ(doc.getMostFreqLetter(), '\0');   
+}
+
+TEST(scanned_doc_ut_1, Positive) {
+	ScannedDoc doc(rootPath + "test1.txt");
+    
+    EXPECT_EQ(doc.getLineCount(), static_cast<const unsigned int>(1));
+    EXPECT_EQ(doc.getWordCount(), static_cast<const unsigned int>(1));
+    EXPECT_EQ(doc.getLetterCount(), static_cast<const unsigned int>(5));
+    EXPECT_EQ(doc.getMostFreqLetter(), 'l');   
+}
+
+TEST(scanned_doc_ut_1a, Positive) {
+	ScannedDoc doc(rootPath + "test1a.txt");
+    
+    EXPECT_EQ(doc.getLineCount(), static_cast<const unsigned int>(1));
+    EXPECT_EQ(doc.getWordCount(), static_cast<const unsigned int>(1));
+    EXPECT_EQ(doc.getLetterCount(), static_cast<const unsigned int>(5));
+    EXPECT_EQ(doc.getMostFreqLetter(), 'l');   
+}
+
+TEST(scanned_doc_ut_1b, Positive) {
+	ScannedDoc doc(rootPath + "test1b.txt");
+    
+    EXPECT_EQ(doc.getLineCount(), static_cast<const unsigned int>(1));
+    EXPECT_EQ(doc.getWordCount(), static_cast<const unsigned int>(2));
+    EXPECT_EQ(doc.getLetterCount(), static_cast<const unsigned int>(12));
+    EXPECT_EQ(doc.getMostFreqLetter(), 'o');   
+}
+
+TEST(scanned_doc_ut_1c, Positive) {
+	ScannedDoc doc(rootPath + "test1c.txt");
+    
+    EXPECT_EQ(doc.getLineCount(), static_cast<const unsigned int>(1));
+    EXPECT_EQ(doc.getWordCount(), static_cast<const unsigned int>(3));
+    EXPECT_EQ(doc.getLetterCount(), static_cast<const unsigned int>(7));
+    EXPECT_EQ(doc.getMostFreqLetter(), 'b');   
+}
+
+TEST(scanned_doc_ut_2, Positive) {
+	ScannedDoc doc(rootPath + "test2.txt");
+    
+    EXPECT_EQ(doc.getLineCount(), static_cast<const unsigned int>(26));
+    EXPECT_EQ(doc.getWordCount(), static_cast<const unsigned int>(26));
+    EXPECT_EQ(doc.getLetterCount(), static_cast<const unsigned int>(26));
+    EXPECT_EQ(doc.getMostFreqLetter(), 'a');   
+}
+
+TEST(scanned_doc_ut_3, Positive) {
+	ScannedDoc doc(rootPath + "test3.txt");
+    
+    EXPECT_EQ(doc.getLineCount(), static_cast<const unsigned int>(26));
+    EXPECT_EQ(doc.getWordCount(), static_cast<const unsigned int>(26));
+    EXPECT_EQ(doc.getLetterCount(), static_cast<const unsigned int>(27));
+    EXPECT_EQ(doc.getMostFreqLetter(), 'n');   
+}
+
+TEST(scanned_doc_ut_4, Positive) {
+	ScannedDoc doc(rootPath + "test4.txt");
+    
+    EXPECT_EQ(doc.getLineCount(), static_cast<const unsigned int>(1));
+    EXPECT_EQ(doc.getWordCount(), static_cast<const unsigned int>(26));
+    EXPECT_EQ(doc.getLetterCount(), static_cast<const unsigned int>(26));
+    EXPECT_EQ(doc.getMostFreqLetter(), 'a');   
+}
+
+TEST(scanned_doc_ut_5, Positive) {
+	ScannedDoc doc(rootPath + "test5.txt");
+    
+    EXPECT_EQ(doc.getLineCount(), static_cast<const unsigned int>(3721));
+    EXPECT_EQ(doc.getWordCount(), static_cast<const unsigned int>(21318));
+    EXPECT_EQ(doc.getLetterCount(), static_cast<const unsigned int>(85791));
+    EXPECT_EQ(doc.getMostFreqLetter(), 'e');   
 }
 
 // Step 3. Call RUN_ALL_TESTS() in main().

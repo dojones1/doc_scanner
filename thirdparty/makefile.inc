@@ -30,6 +30,7 @@ GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 define COMMON_GTEST_LIB
 # 1 - target
 
+            
 # For simplicity and to avoid depending on Google Test's
 # implementation details, the dependencies specified below are
 # conservative and not optimized.  This is fine as Google Test
@@ -57,7 +58,7 @@ $$($(1)_UT_OBJ_DIR)/gtest_main.a : $$($(1)_UT_OBJ_DIR)/gtest-all.o $$($(1)_UT_OB
 $(1)_googletest:$$($(1)_UT_OBJ_DIR)/gtest_main.a
 
 $(1)_googletest_clean: 
-	$(RM) $$($(1)_UT_OBJ_DIR)/gtest.a $$($(1)_UT_OBJ_DIR)/gtest_main.a *.o
+	$(_Q) $(RM) $$($(1)_UT_OBJ_DIR)/gtest.a $$($(1)_UT_OBJ_DIR)/gtest_main.a *.o
 	
 ALL_CLEANS += $(1)_googletest_clean
 THIRDPARTY_DEPS += $(1)_googletest
