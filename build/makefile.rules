@@ -199,7 +199,7 @@ $$($(7)_UT_OBJ_DIR)/%.o:$(ROOT)/%.cpp
 $$($(7)_UT_BIN_DIR)/$(2): $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5))
 	@ echo "\033[0;35m [ $(7)_UT_BIN:     $$@ $<] \033[m"
 	$(_Q) $(MKDIR) `dirname $$@`
-	$(_Q) $$($(7)_CC) $$($(7)_FLAGS) $6 $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5)) -o $$($(7)_UT_BIN_DIR)/$2
+	$(_Q) $$($(7)_CC) $$($(7)_FLAGS) $6 $8 $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5)) -o $$($(7)_UT_BIN_DIR)/$2
 	
 # target dependent on binary
 $(1): $$($(7)_UT_BIN_DIR)/$(2)
@@ -223,15 +223,15 @@ ALL_TESTS_RUN += $(1)_run
 endef
 
 define OSX_UT
-$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),OSX))
+$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),OSX,$(7)))
 endef
  
 define X86_UT
-$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),X86))
+$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),X86,$(7)))
 endef
 
 define ARM_UT
-$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),ARM))
+$(eval $(call COMMON_UT,$(1),$(2),$(3),$(4),$(5),$(6),ARM,$(7)))
 endef
 
 

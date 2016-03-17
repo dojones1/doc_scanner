@@ -10,3 +10,5 @@ build/OSX/bin/SCANNED_DOC_UT
 *.o
 
 *.a
+
+build/test_results/*
