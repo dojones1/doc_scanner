@@ -31,12 +31,19 @@
 //
 // </TechnicalDetails>
 
-
-// Tests Factorial().
-
-TEST(falseTest, Negative) {
+TEST(DISABLED_falseTest, Negative) {
  EXPECT_FALSE(1);
+}
+
+TEST(falseTest, Positive) {
+ EXPECT_FALSE(0);
+}
+TEST(DISABLED_trueTest, Negative) {
  EXPECT_TRUE(0);
+}
+
+TEST(trueTest, Positive) {
+ EXPECT_TRUE(1);
 }
 
 // Step 3. Call RUN_ALL_TESTS() in main().

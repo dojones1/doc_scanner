@@ -199,7 +199,7 @@ $$($(7)_UT_OBJ_DIR)/%.o:$(ROOT)/%.cpp
 $$($(7)_UT_BIN_DIR)/$(2): $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5))
 	@ echo "\033[0;35m [ $(7)_UT_BIN:     $$@ $<] \033[m"
 	$(_Q) $(MKDIR) `dirname $$@`
-	$(_Q) $$($(7)_CC) $$($(7)_FLAGS) $6 $8 $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5)) -o $$($(7)_UT_BIN_DIR)/$2
+	$(_Q) $$($(7)_CC) $$($(7)_FLAGS) $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5)) $8 -o $$($(7)_UT_BIN_DIR)/$2
 	
 # target dependent on binary
 $(1): $$($(7)_UT_BIN_DIR)/$(2)
