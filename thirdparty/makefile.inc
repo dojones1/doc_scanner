@@ -35,23 +35,23 @@ define COMMON_GTEST_LIB
 # conservative and not optimized.  This is fine as Google Test
 # compiles fast and for ordinary users its source rarely changes.
 $$($(1)_UT_OBJ_DIR)/gtest-all.o : $(GTEST_SRCS_)
-	@ echo "\033[0;34m [ $(1)_OBJ_C: $$@] \033[m"
+	@ echo "\033[0;34m [ $(1)_UT_OBJ_C: $$@] \033[m"
 	$(_Q) $(MKDIR) `dirname $$@`
 	$(_Q) $(CXX) $(GTEST_CPPFLAGS) -I$(GTEST_DIR) $(GTEST_CXXFLAGS) -c \
             $(GTEST_DIR)/src/gtest-all.cc  -o $$@ 
 
 $$($(1)_UT_OBJ_DIR)/gtest_main.o : $(GTEST_SRCS_)
-	@ echo "\033[0;34m [ $(1)_OBJ_C++: $$@] \033[m"
+	@ echo "\033[0;34m [ $(1)_UT_OBJ_C++: $$@] \033[m"
 	$(_Q) $(MKDIR) `dirname $$@`
 	$(_Q) $(CXX) $(GTEST_CPPFLAGS) -I$(GTEST_DIR) $(GTEST_CXXFLAGS) -c \
 	        $(GTEST_DIR)/src/gtest_main.cc  -o $$@ 
 
-$$($(1)_UT_OBJ_DIR)/gtest.a : $$($(1)_OBJ_DIR)/gtest-all.o
-	@ echo "\033[0;34m [ $(1)_AR: $$@] \033[m"
+$$($(1)_UT_OBJ_DIR)/gtest.a : $$($(1)_UT_OBJ_DIR)/gtest-all.o
+	@ echo "\033[0;34m [ $(1)_UT_AR: $$@] \033[m"
 	$(_Q) $(AR) $(ARFLAGS) $$@ $$^
 
 $$($(1)_UT_OBJ_DIR)/gtest_main.a : $$($(1)_UT_OBJ_DIR)/gtest-all.o $$($(1)_UT_OBJ_DIR)/gtest_main.o
-	@ echo "\033[0;34m [ $(1)_AR: $$@] \033[m"
+	@ echo "\033[0;34m [ $(1)_UT_AR: $$@] \033[m"
 	$(_Q) $(AR) $(ARFLAGS) $$@ $$^
 	
 $(1)_googletest:$$($(1)_UT_OBJ_DIR)/gtest_main.a
