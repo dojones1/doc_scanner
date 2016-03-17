@@ -4,3 +4,7 @@ build/OSX/*
 build/OSX_UT/*
 build/X86/*
 build/X86_UT/*
+
+build/OSX/bin/SCANNED_DOC_UT
+
+*.o
