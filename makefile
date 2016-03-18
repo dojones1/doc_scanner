@@ -11,14 +11,16 @@ include $(PROCESS_DIR)/makefile.inc
 
 ###########################
 
-software: $(ALL_BINS)
+software: setflags $(ALL_BINS)
 
 alltests: $(ALL_TESTS)
 
 test: $(ALL_TESTS_RUN)
 
 all: directories software test
-
+	@echo "Valgrind: $(VALGRIND)"
+	@echo "CCACHE: $(CCACHE)"
+	
 install: all
 	@echo you must be root to install
 
