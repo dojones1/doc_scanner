@@ -11,9 +11,9 @@ include $(PROCESS_DIR)/makefile.inc
 
 ###########################
 
-software: setflags $(ALL_BINS)
+software: directories $(ALL_BINS)
 
-alltests: $(ALL_TESTS)
+alltests: directories $(ALL_TESTS)
 
 test: $(ALL_TESTS_RUN)
 

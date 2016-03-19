@@ -11,8 +11,11 @@ All build and unit test execution is triggered by the top level makefile
 Build options:
 make software    - compiles all target binaries
 make alltests    - compiles all unit test binaries
-make testrun     - compiles and runs all unit test binaries
+make test     - compiles and runs all unit test binaries
 make all         - compiles everything and runs all unit tests
 make clean       - cleans all build binaries and intermediate objects
 
-The build output by default is relatively quiet to enable a verbose mode add _Q= to the make command.
+Additional flags:
+_Q= 			enables verbose output during compilation
+VALGRIND=Y		enables VALGRIND compilation and execution.
+CCACHE=Y		enables CCACHE for faster compilation and linking.

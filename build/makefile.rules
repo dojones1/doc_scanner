@@ -23,22 +23,30 @@ MKDIR = mkdir -p
 # Control flags
 
 _Q = @
-CCACHE_BIN =
-CCACHE_FLAGS = 
+VALGRIND_BIN =
+VALGRIND_CC_FLAGS = 
+VALGRIND_LINKER_FLAGS =
 
-setflags:
+setvalgrindflags:
 	@ echo "VALGRIND: $(VALGRIND)"
 ifeq ($(VALGRIND),Y)
 	@ echo "Valgrind = Yes"
-else
+VALGRIND_BIN += /usr/local/bin/valgrind --leak-check=yes
+VALGRIND_CC_FLAGS = -g -O0
 endif
+
+CCACHE_BIN =
+CCACHE_FLAGS = 
+
+setccacheflags:
 	@ echo "CCACHE: $(CCACHE)"
 ifeq ($(CCACHE),Y)
 CCACHE_BIN = /usr/local/bin/ccache
 CCACHE_FLAGS = -Qunused-arguments -fcolor-diagnostics
-else
+
 endif
 
+setflags:setvalgrindflags setccacheflags
 
 ###########################
 # Aggregate lists
@@ -52,8 +60,6 @@ ALL_TESTS_RUN =
 
 ###########################
 # Make the Directories for build artefacts
-
-
 directories:
 	$(_Q) $(MKDIR) $(TEST_RESULTS_DIR)
 	$(_Q) $(MKDIR) $(OSX_BUILD_DIR)
@@ -94,12 +100,12 @@ ALL_CLEANS += directories_clean
 define COMMON_LIB
  
 #.c subsubsitution rule i.e. turn c files into .o files
-$($(7)_OBJ_DIR))/%.o:$(ROOT)/%.c
+$($(7)_OBJ_DIR))/%.o:setflags $(ROOT)/%.c
 	$(_Q) $(MKDIR) $(dir $$($(7)_OBJ_DIR)/$<)
 	$(_Q) $(CCACHE_BIN) $($(7)_CC) $$($(7)_FLAGS) $(4) –c $$< -o $$@
  
 #.cpp subsubsitution rule i.e. turn cpp files into .o files
-$($(7)_OBJ_DIR)/%.o:$(ROOT)/%.cpp
+$($(7)_OBJ_DIR)/%.o:setflags $(ROOT)/%.cpp
 	$(_Q) $(MKDIR) $(dir $$($(7)_OBJ_DIR)/$<)
 	$(_Q) $(CCACHE_BIN) $$($(7)_CCPLUSPLUS) $$($(7)_FLAGS) $(6) –c $$< -o $$@
  
@@ -139,19 +145,19 @@ endef
 define COMMON_BIN
 
 #.c subsubsitution rule i.e. turn c files into .o files
-$$($(7)_OBJ_DIR))/%.o:$(ROOT)/%.c
+$$($(7)_OBJ_DIR))/%.o: $(ROOT)/%.c
 	@ echo "\033[0;34m [ $(7)_OBJ_C:     $$@ $<] \033[m"
 	$(_Q) $(MKDIR) `dirname $$@`
 	$(_Q) $(CCACHE_BIN) $$($(7)_CC) $$($(7)_FLAGS) -c $(4) $$< -o $$@
  
 #.cpp subsubsitution rule i.e. turn cpp files into .o files
-$$($(7)_OBJ_DIR)/%.o:$(ROOT)/%.cpp
+$$($(7)_OBJ_DIR)/%.o: $(ROOT)/%.cpp
 	@ echo "\033[0;34m [ $(7)_OBJ_C++: $$@] \033[m"
 	$(_Q) $(MKDIR) `dirname $$@`
 	$(_Q) $(CCACHE_BIN) $$($(7)_CCPLUSPLUS) $$($(7)_FLAGS) -c $(6) $$< -o $$@ 
  
 # bin rule dependent on all .o which are created from the .c and .cpp files passed in
-$$($(7)_BIN_DIR)/$(2): $(patsubst $(ROOT)/%.c, $$($(7)_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_OBJ_DIR)/%.o,$(5))
+$$($(7)_BIN_DIR)/$(2): setflags $(patsubst $(ROOT)/%.c, $$($(7)_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_OBJ_DIR)/%.o,$(5))
 	@ echo "\033[0;35m [ $(7)_BIN:     $$@ $<] \033[m"
 	$(_Q) $(MKDIR) $(dir $$($(7)_BIN_DIR)/$(2))
 	$(_Q) $(CCACHE_BIN) $$($(7)_CC) $$($(7)_FLAGS) $6 $(patsubst $(ROOT)/%.c, $$($(7)_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_OBJ_DIR)/%.o,$(5)) -o $$($(7)_BIN_DIR)/$2
@@ -201,16 +207,16 @@ define COMMON_UT
 $$($(7)_UT_OBJ_DIR))/%.o:$(ROOT)/%.c
 	@ echo "\033[0;34m [ $(7)_UT_OBJ_C:     $$@ $<] \033[m"
 	$(_Q) $(MKDIR) `dirname $$@`
-	$(_Q) $(CCACHE_BIN) $$($(7)_CC) $$($(7)_FLAGS) -c $(4) $$< -o $$@
+	$(_Q) $(CCACHE_BIN) $$($(7)_CC) $$($(7)_FLAGS) $(VALGRIND_CC_FLAGS) -c $(4) $$< -o $$@
  
 #.cpp subsubsitution rule i.e. turn cpp files into .o files
 $$($(7)_UT_OBJ_DIR)/%.o:$(ROOT)/%.cpp
 	@ echo "\033[0;34m [ $(7)_UT_OBJ_C++: $$@] \033[m"
 	$(_Q) $(MKDIR) `dirname $$@`
-	$(_Q) $(CCACHE_BIN) $$($(7)_CCPLUSPLUS) $$($(7)_FLAGS) -c $(6) $$< -o $$@ 
+	$(_Q) $(CCACHE_BIN) $$($(7)_CCPLUSPLUS) $$($(7)_FLAGS) $(VALGRIND_CC_FLAGS) -c $(6) $$< -o $$@ 
  
 # bin rule dependent on all .o which are created from the .c and .cpp files passed in
-$$($(7)_UT_BIN_DIR)/$(2): $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5))
+$$($(7)_UT_BIN_DIR)/$(2): setflags $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5))
 	@ echo "\033[0;35m [ $(7)_UT_BIN:     $$@ $<] \033[m"
 	$(_Q) $(MKDIR) `dirname $$@`
 	$(_Q) $(CCACHE_BIN) $$($(7)_CC) $$($(7)_FLAGS) $(patsubst $(ROOT)/%.c, $$($(7)_UT_OBJ_DIR)/%.o,$(3)) $(patsubst $(ROOT)/%.cpp, $$($(7)_UT_OBJ_DIR)/%.o,$(5)) $8 -o $$($(7)_UT_BIN_DIR)/$2
@@ -230,7 +236,7 @@ ALL_TESTS += $$($(7)_UT_BIN_DIR)/$(2)
 
 $(1)_run: $(1)
 	@ echo "\033[0;37m [ $(7)_UT_RUN:  $$@ ] \033[m"
-	$(_Q) $$($(7)_UT_BIN_DIR)/$(2) --gtest_output=xml:$(TEST_RESULTS_DIR)/$(1).xml
+	$(_Q) $(VALGRIND_BIN) $$($(7)_UT_BIN_DIR)/$(2) --gtest_output=xml:$(TEST_RESULTS_DIR)/$(1).xml
 
 ALL_TESTS_RUN += $(1)_run
 
